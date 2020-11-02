@@ -15,7 +15,7 @@ exports.nguoidung_create = async(request, response)=>{
         var nd = await NguoiDung.find({ dienthoai: request.body.dienthoai}).exec();
         if (nd.length != 0){
             response.json({          
-                message: 'Phone number has exist',
+                message: 'Số điện thoại đã tồn tại!',
                 data: nd
             });
         } else {
@@ -24,7 +24,7 @@ exports.nguoidung_create = async(request, response)=>{
             const result = await NguoiDung.findById(res.id).exec();
             response.json({
                 success: true,
-                message: 'User created successfully',
+                message: 'Thêm người dùng thành công!',
                 data: result
             });
         }
@@ -32,7 +32,11 @@ exports.nguoidung_create = async(request, response)=>{
         
 
     } catch (error){
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 };
 
@@ -47,7 +51,11 @@ exports.nguoidung_list = async(request, response) =>{
     
     
     } catch (error){
-        response.status(500).send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 };
 
@@ -60,7 +68,7 @@ exports.nguoidung_get = async(request, response)=>{
             });
         } else{
             response.json({
-                message: 'User not found'
+                message: 'Người dùng không tồn tại!'
             });
         }
         
@@ -91,13 +99,13 @@ exports.nguoidung_update = async(request, response)=>{
                 const nd =  await NguoiDung.findById(request.params.id).exec();
                 response.json({
                     success: true,
-                    message: 'User updated successfully',
+                    message: 'Cập nhật thông tin người dùng thành công!',
                     data: nd
                 });
             }
             if (ndtrung[0]._id != request.params.id){
                 response.json({          
-                    message: 'User has exist',
+                    message: 'Người dùng đã tồn tại!',
                     data: ndtrung
                 });
             }
@@ -105,12 +113,16 @@ exports.nguoidung_update = async(request, response)=>{
             
         } else{
             response.json({
-                message: 'User not found'
+                message: 'Người dùng không tồn tại!'
             });
         }
         
     } catch(error){
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }
 
@@ -120,15 +132,19 @@ exports.nguoidung_delete = async(request, response)=>{
         if (result){
             var result = await NguoiDung.deleteOne({ _id: request.params.id}).exec();
             response.json({
-                message: 'User deleted successfully'
+                message: 'Xóa thông tin người dùng thành công!'
             });
         } else{
             response.json({
-                message: 'User not found'
+                message: 'Người dùng không tồn tại!'
             });
         }
     } catch (error){
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }
 
@@ -140,16 +156,20 @@ exports.nguoidung_active = async(request, response)=>{
             var res = await NguoiDung.findById(request.params.id).exec();
             response.json({
                 success: true,
-                message: 'User activated successfully',
+                message: 'Kích hoạt người dùng thành công!',
                 data: res
             })
         } else{
             response.json({
-                message: 'User not found'
+                message: 'Người dùng không tồn tại!'
             });
         }
     } catch (error) {
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }
 
@@ -161,16 +181,20 @@ exports.nguoidung_deactive = async(request, response)=>{
             var res = await NguoiDung.findById(request.params.id).exec();
             response.json({
                 success: true,
-                message: 'User deactivated successfully',
+                message: 'Vô hiệu hóa người dùng thành công!',
                 data: res
             })
         } else{
             response.json({
-                message: 'User not found'
+                message: 'Người dùng không tồn tại!'
             });
         }
     } catch (error) {
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }
 
@@ -182,15 +206,19 @@ exports.nguoidung_avatar = async(request, response)=>{
             var res = await NguoiDung.findById(request.params.id).exec();
             response.json({
                 success: true,
-                message: 'Avatar updated successfully',
+                message: 'Cập nhật ảnh đại diện thành công!',
                 data: res
             })
         } else{
             response.json({
-                message: 'User not found'
+                message: 'Người dùng không tồn tại!'
             });
         }
     } catch (error) {
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }

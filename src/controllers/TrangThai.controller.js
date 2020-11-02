@@ -18,7 +18,7 @@ exports.trangthai_create = async(request, response)=>{
             var result = await trangthai.save();
             response.json({
                 success: true,
-                message: 'Stage created successfully',
+                message: 'Stage created thành công!',
                 data: result
             });
         } else {
@@ -28,7 +28,11 @@ exports.trangthai_create = async(request, response)=>{
             });
         }
     } catch (error){
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 };
 
@@ -39,7 +43,11 @@ exports.trangthai_list = async(request, response) =>{
             data: result
         });
     } catch (error){
-        response.status(500).send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 };
 
@@ -52,7 +60,7 @@ exports.trangthai_get = async(request, response)=>{
             });
         } else{
             response.json({
-                message: 'Stage not found'
+                message: 'Stage không tồn tại!'
             });
         }
         
@@ -78,7 +86,7 @@ exports.trangthai_update = async(request, response)=>{
                 var res = await result.save();
                 response.json({
                     success: true,
-                    message: 'Stage updated successfully',
+                    message: 'Stage updated thành công!',
                     data: res
                 });
             }
@@ -91,12 +99,16 @@ exports.trangthai_update = async(request, response)=>{
             
         } else{
             response.json({
-                message: 'Stage not found'
+                message: 'Stage không tồn tại!'
             });
         }
         
     } catch(error){
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }
 
@@ -106,14 +118,18 @@ exports.trangthai_delete = async(request, response)=>{
         if (result){
             var result = await TrangThai.deleteOne({ _id: request.params.id}).exec();
             response.json({
-                message: 'Stage deleted successfully'
+                message: 'Stage deleted thành công!'
             });
         } else{
             response.json({
-                message: 'Stage not found'
+                message: 'Stage không tồn tại!'
             });
         }
     } catch (error){
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }

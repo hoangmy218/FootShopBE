@@ -4,7 +4,9 @@ const router = express.Router();
 // Require the controllers WHICH WE DID NOT CREATE YET!!
 const thuonghieu_controller = require('../controllers/ThuongHieu.controller');
 const { validate } = require('../validator');
-const auth = require('../middleware/auth')
+// const auth = require('../middleware/auth')
+const auth_validate = require('../controllers/Validate.controller');
+const auth = auth_validate.validate;
 // a simple test url to check that all of our files are communicating correctly.
 router.get('/test', thuonghieu_controller.test);
 

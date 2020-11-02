@@ -20,7 +20,7 @@ exports.thuonghieu_create = async(request, response)=>{
             if (th.length != 0){
                 response.json({       
                     success: false,   
-                    message: 'Brand has exist',
+                    message: 'Thương hiệu đã tồn tại!',
                     data: th
                 });
             } else {
@@ -28,13 +28,17 @@ exports.thuonghieu_create = async(request, response)=>{
                 var result = await thuonghieu.save();
                 response.json({
                     success: true,
-                    message: 'Brand created successfully',
+                    message: 'Thêm thương hiệu thành công!',
                     data: result
                 });
             }
     
         } catch (error){
-            response.send(error);
+            console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
         }
     }
     
@@ -47,7 +51,11 @@ exports.thuonghieu_list = async(request, response) =>{
             data: result
         });
     } catch (error){
-        response.status(500).send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 };
 
@@ -61,7 +69,7 @@ exports.thuonghieu_get = async(request, response)=>{
         } else{
             response.json({
                 success: false,
-                message: 'Brand not found'
+                message: 'Thương hiệu không tồn tại!'
             });
         }
         
@@ -88,26 +96,30 @@ exports.thuonghieu_update = async(request, response)=>{
                     var res = await result.save();
                     response.json({
                         success: true,
-                        message: 'Brand updated successfully',
+                        message: 'Cập nhật thương hiệu thành công!',
                         data: res
                     });
                 }
                 if (th[0]._id != request.params.id){
                     response.json({
                         success: false,
-                        message: 'Brand has exist'
+                        message: 'Thương hiệu đã tồn tại!'
                     });
                 }
                 
             } else{
                 response.json({
                     success: false,
-                    message: 'Brand not found'
+                    message: 'Thương hiệu không tồn tại!'
                 });
             }
             
         } catch(error){
-            response.send(error);
+            console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
         }
     }
    
@@ -121,23 +133,27 @@ exports.thuonghieu_delete = async(request, response)=>{
             if (sp.length > 0){
                 response.json({
                     success: false,
-                    message: 'Cannot delete this brand'
+                    message: 'Không thể xóa thương hiệu!'
                 });
             } else {
                 var result = await ThuongHieu.deleteOne({ _id: request.params.id}).exec();
                 response.json({
                     success: true,
-                    message: 'Brand deleted successfully'
+                    message: 'Xóa thương hiệu thành công!'
                 });
             }
             
         } else{
             response.json({
                 success: false,
-                message: 'Brand not found'
+                message: 'Thương hiệu không tồn tại!'
             });
         }
     } catch (error){
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }

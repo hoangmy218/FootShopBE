@@ -3,7 +3,9 @@ const router = express.Router();
 const { validate } = require('../validator');
 // Require the controllers WHICH WE DID NOT CREATE YET!!
 const chitietsanpham_controller = require('../controllers/ChiTietSanPham.controller');
-const auth = require('../middleware/auth')
+// const auth = require('../middleware/auth')
+const auth_validate = require('../controllers/Validate.controller');
+const auth = auth_validate.validate;
 // a simple test url to check that all of our files are communicating correctly.
 
 
@@ -13,4 +15,6 @@ router.get('/get/:id', auth, chitietsanpham_controller.chitietsanpham_get);
 router.put('/update/:id', auth, chitietsanpham_controller.chitietsanpham_update);
 router.delete('/del/:id', auth, chitietsanpham_controller.chitietsanpham_delete);
 router.post('/:id/add-list-size', auth, chitietsanpham_controller.chitietsanpham_create_arr);
+router.post('/:id/update-list-size', auth, chitietsanpham_controller.chitietsanpham_update_arr);
+
 module.exports = router;

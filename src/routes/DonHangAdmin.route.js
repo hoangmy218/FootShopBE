@@ -5,7 +5,9 @@ const router = express.Router();
 const donhang_controller = require('../controllers/DonHang.controller');
 const { validate } = require('../validator');
 // a simple test url to check that all of our files are communicating correctly.
-const auth = require('../middleware/auth');
+// const auth = require('../middleware/auth')
+const auth_validate = require('../controllers/Validate.controller');
+const auth = auth_validate.validate;
 
 router.get('/list', auth, donhang_controller.donhang_list);
 router.put('/:id/confirm',auth,  donhang_controller.donhang_confirm);

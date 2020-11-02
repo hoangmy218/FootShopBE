@@ -8,6 +8,7 @@ const NguoiDung = require('../models/NguoiDung.model');
 const DonHang = require('../models/DonHang.model');
 const ChiTietDonHang = require('../models/ChiTietDonHang.model');
 const BinhLuan = require('../models/BinhLuan.model');
+const PhieuNhap = require('../models/PhieuNhap.model');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 var ObjectId = mongoose.Schema.Types.ObjectId;
@@ -143,13 +144,164 @@ exports.Overview_customer_graph = async(request, response)=>{
         })
     }
 }
+exports.Overview_out_of_stocks = async(request, response)=>{
+    try {
+        var sanpham = await ChiTietSanPham.aggregate([
+            {$match: {soluong: { $eq: 0}}}, // sl ton = 0
+            {
+                $lookup:
+                  {
+                    from: "kichcos",
+                    localField: "kichco_id",
+                    foreignField: "_id",
+                    as: "kichco_id"
+                  } 
+             },
+             {
+                $unwind: {
+                  path: "$kichco_id",
+                  preserveNullAndEmptyArrays: true
+                }
+            },
+             {
+                $lookup: 
+                    {
+                        from: "mausanphams",
+                        localField: "mausanpham_id",
+                        foreignField: "_id",
+                        as: "mausanpham_id"
+                    }
+             },
+             {
+                $unwind: {
+                  path: "$mausanpham_id",
+                  preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: 
+                    {
+                        from: "sanphams",
+                        localField: "mausanpham_id.sanpham_id",
+                        foreignField: "_id",
+                        as: "mausanpham_id.sanpham_id"
+                    }
+             },
+             {
+                $unwind: {
+                  path: "$mausanpham_id.sanpham_id",
+                  preserveNullAndEmptyArrays: true
+                }
+            },
+             {
+                $lookup: 
+                    {
+                        from: "mausacs",
+                        localField: "mausanpham_id.mausac_id",
+                        foreignField: "_id",
+                        as: "mausanpham_id.mausac_id"
+                    }
+             },
+             {
+                $unwind: {
+                  path: "$mausanpham_id.mausac_id",
+                  preserveNullAndEmptyArrays: true
+                }
+            },
+        ]);
+        // var sp = sanpham.populate()
+        var sanpham_total = await ChiTietSanPham.aggregate([
+            {$match: {soluong: { $eq: 0}}}, // 0 < sl ton <= 3
+            {$count: 'total'}
+        ])
+        if (sanpham.length == 0) {
+            total = 0
+        }else{
+            total = sanpham_total[0].total
+        }
+        var array_end = sanpham.filter(function(el){
+            return el.mausanpham_id._id != undefined;
+        })
+        console.log(array_end)
+        
+        response.json({
+            data: array_end,
+            total
+        })
+    } catch (error) {
+        console.log(error)
+        response.json({
+            message: error
+        })
+    }
+}
 
 exports.Overview_low_stocks = async(request, response)=>{
     try {
         var sanpham = await ChiTietSanPham.aggregate([
-            {$match: {soluong: { $gt: 0, $lte: 3}}} // 0 < sl ton <= 3
-            // {$count: 'total'}
-        ])
+            {$match: {soluong: { $gt: 0, $lte: 3}}}, // 0 < sl ton <= 3
+            {
+                $lookup:
+                  {
+                    from: "kichcos",
+                    localField: "kichco_id",
+                    foreignField: "_id",
+                    as: "kichco_id"
+                  } 
+             },
+             {
+                $unwind: {
+                  path: "$kichco_id",
+                  preserveNullAndEmptyArrays: true
+                }
+            },
+             {
+                $lookup: 
+                    {
+                        from: "mausanphams",
+                        localField: "mausanpham_id",
+                        foreignField: "_id",
+                        as: "mausanpham_id"
+                    }
+             },
+             {
+                $unwind: {
+                  path: "$mausanpham_id",
+                  preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: 
+                    {
+                        from: "sanphams",
+                        localField: "mausanpham_id.sanpham_id",
+                        foreignField: "_id",
+                        as: "mausanpham_id.sanpham_id"
+                    }
+             },
+             {
+                $unwind: {
+                  path: "$mausanpham_id.sanpham_id",
+                  preserveNullAndEmptyArrays: true
+                }
+            },
+             {
+                $lookup: 
+                    {
+                        from: "mausacs",
+                        localField: "mausanpham_id.mausac_id",
+                        foreignField: "_id",
+                        as: "mausanpham_id.mausac_id"
+                    }
+             },
+             {
+                $unwind: {
+                  path: "$mausanpham_id.mausac_id",
+                  preserveNullAndEmptyArrays: true
+                }
+            },
+        ]);
+        // var sp = sanpham.populate()
         var sanpham_total = await ChiTietSanPham.aggregate([
             {$match: {soluong: { $gt: 0, $lte: 3}}}, // 0 < sl ton <= 3
             {$count: 'total'}
@@ -165,6 +317,7 @@ exports.Overview_low_stocks = async(request, response)=>{
             total
         })
     } catch (error) {
+        console.log(error)
         response.json({
             message: error
         })
@@ -189,6 +342,32 @@ exports.Overview_new_orders = async(request, response)=>{
             data: new_order,
             total
         })
+    } catch (error) {
+        response.json({
+            message: error
+        })
+    }
+}
+
+
+exports.Overview_stock_graph = async(request, response)=>{
+    try {
+        
+            var phieunhap = await PhieuNhap.aggregate([
+                { $project:
+                    { _id: 1,
+                        yearBillDate: {$year: "$ngay"},
+                        monthBillDate: {$month: "$ngay"}
+                    }
+                },
+                { $group:
+                    { _id: {yearBillDate: "$yearBillDate", monthBillDate: "$monthBillDate"},
+                        sum: {$sum: 1}
+                    }
+                } 
+            ])
+            response.json({data: phieunhap})
+        
     } catch (error) {
         response.json({
             message: error
@@ -225,7 +404,7 @@ exports.Overview_revenue_graph = async(request, response)=>{
     try {
         
             var donhang = await DonHang.aggregate([
-                {$match: {trangthai: {$gt: 1 , $lt: 4}}},
+                {$match: {trangthai: {$eq: 4}}},
                 { $project:
                     { _id: 1,
                         yearBillDate: {$year: "$ngaydat"},
@@ -269,7 +448,7 @@ exports.Overview_highest_rated_product = async(request, response)=>{
 exports.Overview_recently_sold = async(request, response)=>{
     try {
         var phanloai = await DonHang.aggregate([
-            {$match: {trangthai: {$gt: 1 , $lt: 4}}},
+            {$match: {trangthai: {$gt: 1 , $lt: 4}}}, //don hang moi // chua hoan tat chua huy
             { $project:
                 { _id: 1,
                     yearBillDate: {$year: "$ngaydat"},

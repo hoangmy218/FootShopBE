@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/auth')
+// const auth = require('../middleware/auth')
+const auth_validate = require('../controllers/Validate.controller');
+const auth = auth_validate.validate;
 // Require the controllers WHICH WE DID NOT CREATE YET!!
 const YeuThich_controller = require('../controllers/YeuThich.controller');
 const { validate } = require('../validator');

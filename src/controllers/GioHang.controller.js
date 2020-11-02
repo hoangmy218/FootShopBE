@@ -10,6 +10,7 @@ exports.giohang_create = async(request, response)=>{
     console.log(request.body)
     var errors = validationResult(request)
     if (!errors.isEmpty()){
+        console.log(errors)
         response.json({
             success: false,
             error: errors
@@ -18,18 +19,21 @@ exports.giohang_create = async(request, response)=>{
         if (request.body.soluongdat == 0){
             response.json({
                 success: false,
-                error: "Min quantity must be 1"
+                error: "Số lượng ít nhất là 1"
             })
         }else{
             try {
+                console.log('body', request.body)
                 var giohang = await GioHang.find(
-                    {nguoidung_id: request.user._id, ctsp_id: request.body.ctsp_id}
+                    {nguoidung_id: request.payload.username, ctsp_id: request.body.ctsp_id}
                     ).exec();
                 var ctsp = await ChiTietSanPham.findById(request.body.ctsp_id).exec();
+                console.log('ctsp', ctsp)
                 if (ctsp.soluong == 0){
+                    console.log('Sản phẩm đã hết hàng!')
                     response.json({
                         success: false,
-                        error: 'Sorry! This item has gone'
+                        message: 'Sản phẩm đã hết hàng!'
                     })
                 }
                 if ( giohang.length == 0){
@@ -37,7 +41,7 @@ exports.giohang_create = async(request, response)=>{
                     //SLDAT HOP LE
                     if (request.body.soluongdat < ctsp.soluong){
                         var giohang_moi = new GioHang({
-                            nguoidung_id: request.user._id,
+                            nguoidung_id: request.payload.username,
                             ctsp_id: request.body.ctsp_id,
                             soluongdat: request.body.soluongdat
                         })
@@ -46,13 +50,13 @@ exports.giohang_create = async(request, response)=>{
                         var gh = await giohang_moi.save();
                         response.json({
                             success: true,
-                            message: "Product added to cart successfully",
+                            message: "Thêm sản phẩm vào giỏ hàng thành công!",
                             data: gh
                         })
                     } else {
                         //DAT VOI SLTON MAX
                         var giohang_moi = new GioHang({
-                            nguoidung_id: request.user._id,
+                            nguoidung_id: request.payload.username,
                             ctsp_id: request.body.ctsp_id,
                             soluongdat: ctsp.soluong
                         })
@@ -60,7 +64,7 @@ exports.giohang_create = async(request, response)=>{
                         var gh = await giohang_moi.save();
                         response.json({
                             success: true,
-                            message: "Product added to cart successfully",
+                            message: "Thêm sản phẩm vào giỏ hàng thành công!",
                             data: gh
                         })
                     }
@@ -69,7 +73,7 @@ exports.giohang_create = async(request, response)=>{
                     if (giohang[0].soluongdat == ctsp.soluong ){
                         response.json({
                             success: false,
-                            message: 'You have already added this item'
+                            message: 'Thêm sản phẩm vào giỏ hàng thành công!'
                         })
                     }
                     
@@ -81,12 +85,13 @@ exports.giohang_create = async(request, response)=>{
                     var giohang_cn = await GioHang.findById(giohang[0]._id).exec();
                     response.json({
                         success: true,
-                        message: "Product added to cart successfully",
+                        message: "Thêm sản phẩm vào giỏ hàng thành công!",
                         giohang: giohang_cn
                     })
                 }
                 
             } catch (error) {
+                console.log(error)
                 response.json({
                     success: false,
                     message: error
@@ -95,7 +100,6 @@ exports.giohang_create = async(request, response)=>{
         }
         
     }
-    
 }
 
 exports.giohang_update = async(request, response)=>{
@@ -108,7 +112,7 @@ exports.giohang_update = async(request, response)=>{
     if (request.body.soluongdat == 0){
         response.json({
             success: false,
-            error: "Min quantity must be 1"
+            error: "Số lượng ít nhất là 1"
         })
     }
     try {
@@ -121,12 +125,12 @@ exports.giohang_update = async(request, response)=>{
         if (ctsp.soluong == 0){
             response.json({
                 success: false,
-                error: 'Sorry! This item has gone'
+                error: 'Sản phẩm đã hết hàng!'
             })
         }
         var soluongton = ctsp.soluong
         //CO SP TRUNG TRONG GIO HANG
-        var sanpham = await GioHang.find({ nguoidung_id: request.user._id, ctsp_id: ma_ctsp_moi}).exec();
+        var sanpham = await GioHang.find({ nguoidung_id: request.payload.username, ctsp_id: ma_ctsp_moi}).exec();
         if (sanpham.length >=1 ){
             if (sanpham.length ==1 && ma_spgiohang == sanpham[0]._id){
                 //KHONG CO SP TRUNG TRONG GIO HANG
@@ -135,14 +139,14 @@ exports.giohang_update = async(request, response)=>{
                     soluongdat = soluongton
                 }
                 spgiohang.set({
-                    nguoidung_id: request.user._id,
+                    nguoidung_id: request.payload.username,
                     ctsp_id: ma_ctsp_moi,
                     soluongdat: soluongdat
                 });
                 var res = await spgiohang.save();
                 response.json({
                     success: true,
-                    message: "Product updated successfully",
+                    message: "Cập nhật giỏ hàng thành công!",
                     data: res
                     // sanpham: sanpham
                 })
@@ -158,7 +162,7 @@ exports.giohang_update = async(request, response)=>{
                     tongsanpham = soluongton
                 }
                 var giohang_moi = new GioHang({
-                    nguoidung_id: request.user._id,
+                    nguoidung_id: request.payload.username,
                     ctsp_id: request.body.ctsp_id,
                     soluongdat: tongsanpham
                 })
@@ -166,7 +170,7 @@ exports.giohang_update = async(request, response)=>{
                 var gh = await giohang_moi.save();
                 response.json({
                     success: true,
-                    message: "Product updated successfully",
+                    message: "Cập nhật giỏ hàng thành công!",
                     data: gh
                     // sanpham: sanpham
                 })
@@ -181,14 +185,14 @@ exports.giohang_update = async(request, response)=>{
                 soluongdat = soluongton
             }
             spgiohang.set({
-                nguoidung_id: request.user._id,
+                nguoidung_id: request.payload.username,
                 ctsp_id: ma_ctsp_moi,
                 soluongdat: soluongdat
             });
             var res = await spgiohang.save();
             response.json({
                 success: true,
-                message: "Product updated successfully",
+                message: "Cập nhật giỏ hàng thành công!",
                 data: res,
                 sanpham: sanpham
             })
@@ -205,15 +209,20 @@ exports.giohang_update = async(request, response)=>{
 
 exports.giohang_list = async(request, response)=>{
     try {
+        console.log('req pl', request.payload)
         var sanpham = await GioHang.find(
-            {nguoidung_id: request.user._id}
+            {nguoidung_id: request.payload.username}
             ).exec();
             // response.json({
             //     data: sanpham
             // })
+            console.log('GIO HANG', sanpham)
         for (var i=0; i<sanpham.length; i++){
             var ctsp = await ChiTietSanPham.findById(sanpham[i].ctsp_id).exec();
-            
+            console.log('ctsp', i, ctsp)
+            if (ctsp.length == 0){
+                await GioHang.deleteOne({ _id: sanpham[i]._id}).exec()
+            }
             if (sanpham[i].soluongdat > ctsp.soluong && ctsp.soluong > 0){
                 await GioHang.update({ _id: sanpham[i]._id}, {$set: {soluongdat: ctsp.soluong}}).exec()
             }else if (ctsp.soluong == 0 || sanpham[i].soluongdat == 0){
@@ -222,7 +231,7 @@ exports.giohang_list = async(request, response)=>{
         }
         var result = {}
         var giohang = await GioHang.find(
-            {nguoidung_id: request.user._id}
+            {nguoidung_id: request.payload.username}
             ).populate({
                 path: 'ctsp_id',
                 populate: [
@@ -264,6 +273,7 @@ exports.giohang_list = async(request, response)=>{
             result: result
         })
     } catch (error) {
+        console.log(error)
         response.json({
             success: false,
             error: error
@@ -273,7 +283,7 @@ exports.giohang_list = async(request, response)=>{
 
 exports.giohang_shortlist = async(request, response)=>{
     try {
-        var giohang  = await GioHang.find({nguoidung_id: request.user._id}).exec();
+        var giohang  = await GioHang.find({nguoidung_id: request.payload.username}).exec();
         response.json({
             data: giohang
         })
@@ -293,12 +303,12 @@ exports.giohang_delete = async(request, response)=>{
             await GioHang.deleteOne({ _id: ma_spgiohang}).exec()
             response.json({
                 success: true,
-                message: 'Product deleted successfully'
+                message: 'Xóa sản phẩm trong giỏ hàng thành công!'
             });
         }else{
             response.json({
                 success: false,
-                message: "Product not found"
+                message: "Sản phẩm không tồn tại!"
             })
         }
     } catch (error) {
@@ -311,10 +321,10 @@ exports.giohang_delete = async(request, response)=>{
 exports.giohang_clear = async(request, response)=>{
     try {
         
-        await GioHang.deleteMany({nguoidung_id: request.user._id}).exec();
+        await GioHang.deleteMany({nguoidung_id: request.payload.username}).exec();
         response.json({
             success: true,
-            message: 'Cart cleared successfully'
+            message: 'Xóa giỏ hàng thành công!'
         });
         
     } catch (error) {

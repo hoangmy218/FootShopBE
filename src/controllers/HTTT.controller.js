@@ -16,7 +16,7 @@ exports.httt_create = async(request, response)=>{
             if (hinhthuc.length != 0){
                 response.json({   
                     success: false,       
-                    message: 'Payment has exist',
+                    message: 'Phương thức thanh toán đã tồn tại!',
                     data: hinhthuc
                 });
             } else {
@@ -24,13 +24,17 @@ exports.httt_create = async(request, response)=>{
                 var result = await httt.save();
                 response.json({
                     success: true,
-                    message: 'Payment created successfully',
+                    message: 'Thêm phương thức thanh toán thành công!',
                     data: result
                 });
             }
     
         } catch (error){
-            response.send(error);
+            console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
         }
     }
     
@@ -57,7 +61,7 @@ exports.httt_get = async(request, response)=>{
         } else{
             response.json({
                 success: false, 
-                message: 'Payment not found'
+                message: 'Phương thức thanh toán không tồn tại!'
             });
         }
         
@@ -84,14 +88,14 @@ exports.httt_update = async(request, response)=>{
                     var res = await result.save();
                     response.json({
                         success: true,
-                        message: 'Payment updated successfully',
+                        message: 'Cập nhật phương thức thanh toán thành công!',
                         data: res
                     });
                 }
                 if (hinhthuc[0]._id != request.params.id){
                     response.json({   
                         success: false,        
-                        message: 'Payment has exist',
+                        message: 'Phương thức thanh toán đã tồn tại!',
                         data: hinhthuc
                     });
                 }
@@ -99,12 +103,16 @@ exports.httt_update = async(request, response)=>{
             } else{
                 response.json({
                     success: false, 
-                    message: 'Payment not found'
+                    message: 'Phương thức thanh toán không tồn tại!'
                 });
             }
             
         } catch(error){
-            response.send(error);
+            console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
         }
     }
     
@@ -118,23 +126,27 @@ exports.httt_delete = async(request, response)=>{
             if (dh.length > 0 ){
                 response.json({
                     success: false, 
-                    message: 'Cannot delete this payment'
+                    message: 'Không thể xóa phương thức thanh toán!'
                 });
             }else{
                 var result = await HTTT.deleteOne({ _id: request.params.id}).exec();
                 response.json({
                     success: true, 
-                    message: 'Payment deleted successfully'
+                    message: 'Xóa phương thức thanh toán thành công!'
                 });
             }
             
         } else{
             response.json({
                 success: false, 
-                message: 'Payment not found'
+                message: 'Phương thức thanh toán không tồn tại!'
             });
         }
     } catch (error){
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }

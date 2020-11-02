@@ -16,7 +16,7 @@ exports.kichco_create = async(request, response)=>{
             if (kc.length != 0){
                 response.json({    
                     success: false,      
-                    message: 'Size has exist',
+                    message: 'Kích cỡ đã tồn tại!',
                     data: kc
                 });
             } else {
@@ -24,13 +24,17 @@ exports.kichco_create = async(request, response)=>{
                 var result = await kichco.save();
                 response.json({
                     success: true,
-                    message: 'Size created successfully',
+                    message: 'Thêm kích cỡ thành công!',
                     data: result
                 });
             }
     
         } catch (error){
-            response.send(error);
+            console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
         }
     }
     
@@ -43,7 +47,11 @@ exports.kichco_list = async(request, response) =>{
             data: result
         });
     } catch (error){
-        response.status(500).send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 };
 
@@ -57,7 +65,7 @@ exports.kichco_get = async(request, response)=>{
         } else{
             response.json({
                 success: false,  
-                message: 'Size not found'
+                message: 'Kích cỡ không tồn tại!'
             });
         }
         
@@ -84,14 +92,14 @@ exports.kichco_update = async(request, response)=>{
                     var res = await result.save();
                     response.json({
                         success: true,
-                        message: 'Size updated successfully',
+                        message: 'Cập nhật kích cỡ thành công!',
                         data: res
                     });
                 }
                 if (kc[0]._id != request.params.id){
                     response.json({       
                         success: false,     
-                        message: 'Size has exist',
+                        message: 'Kích cỡ đã tồn tại!',
                         data: kc
                     });
                 }
@@ -99,12 +107,16 @@ exports.kichco_update = async(request, response)=>{
             } else{
                 response.json({
                     success: false,  
-                    message: 'Size not found'
+                    message: 'Kích cỡ không tồn tại!'
                 });
             }
             
         } catch(error){
-            response.send(error);
+            console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
         }
     }
     
@@ -118,22 +130,26 @@ exports.kichco_delete = async(request, response)=>{
             if (ctsp.length > 0 ){
                 response.json({
                     success: false,  
-                    message: 'Cannot delete this size'
+                    message: 'Không thể xóa kích cỡ!'
                 });
             }else {
                 var result = await KichCo.deleteOne({ _id: request.params.id}).exec();
                 response.json({
                     success: true,  
-                    message: 'Size deleted successfully'
+                    message: 'Xóa kích cỡ thành công!'
                 });
             }
         } else{
             response.json({
                 success: false,  
-                message: 'Size not found'
+                message: 'Kích cỡ không tồn tại!'
             });
         }
     } catch (error){
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }

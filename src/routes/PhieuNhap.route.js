@@ -4,7 +4,9 @@ const router = express.Router();
 // Require the controllers WHICH WE DID NOT CREATE YET!!
 const phieunhap_controller = require('../controllers/PhieuNhap.controller');
 const { validate } = require('../validator');
-const auth = require('../middleware/auth')
+// const auth = require('../middleware/auth')
+const auth_validate = require('../controllers/Validate.controller');
+const auth = auth_validate.validate;
 // a simple test url to check that all of our files are communicating correctly.
 
 
@@ -15,10 +17,12 @@ router.put('/update/:id', auth, validate.validatePhieuNhap(), phieunhap_controll
 router.put('/:id/save',  auth, phieunhap_controller.phieunhap_save);
 router.delete('/del/:id', auth, phieunhap_controller.phieunhap_delete);
 router.post('/:id/create', auth, phieunhap_controller.chitietphieunhap_create);
+//list san pham trong phieu nhap
 router.get('/:id/list',  auth,phieunhap_controller.chitietphieunhap_list);
 router.delete('/chitiet/del/:id', auth, phieunhap_controller.chitietphieunhap_delete);
 router.put('/chitiet/update/:id', auth, phieunhap_controller.chitietphieunhap_update);
 //add pro color size 
 router.post('/:id/add', auth, phieunhap_controller.chitietphieunhap_create_pcs);
 router.post('/:id/add-list-pro', auth, phieunhap_controller.chitietphieunhap_create_arr);
+router.post('/:id/update-list-pro', auth, phieunhap_controller.chitietphieunhap_update_arr);
 module.exports = router;

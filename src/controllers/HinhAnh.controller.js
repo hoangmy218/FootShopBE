@@ -9,13 +9,17 @@ exports.hinhanh_create = async(request, response)=>{
             var result = await hinhanh.save();
             response.json({
                 success: true,
-                message: 'Image created successfully',
+                message: 'Thêm hình ảnh thành công!',
                 data: result
             });
         
 
     } catch (error){
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 };
 
@@ -26,7 +30,11 @@ exports.hinhanh_list = async(request, response) =>{
             data: result
         });
     } catch (error){
-        response.status(500).send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 };
 
@@ -39,12 +47,16 @@ exports.hinhanh_get = async(request, response)=>{
             });
         } else{
             response.json({
-                message: 'Image not found'
+                message: 'Hình ảnh không tồn tại!'
             });
         }
         
     } catch (error){
-        response.status(500).error(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 };
 
@@ -59,25 +71,29 @@ exports.hinhanh_update = async(request, response)=>{
                 var res = await result.save();
                 response.json({
                     success: true,
-                    message: 'Image updated successfully',
+                    message: 'Cập nhật hình ảnh thành công!',
                     data: res
                 });
             }
             if (ha[0]._id != request.params.id){
                 response.json({          
-                    message: 'Image has exist',
+                    message: 'Hình ảnh đã tồn tại!',
                     data: ha
                 });
             }
             
         } else{
             response.json({
-                message: 'Image not found'
+                message: 'Hình ảnh không tồn tại!'
             });
         }
         
     } catch(error){
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }
 
@@ -87,15 +103,19 @@ exports.hinhanh_delete = async(request, response)=>{
         if (result){
             var result = await HinhAnh.deleteOne({ _id: request.params.id}).exec();
             response.json({
-                message: 'Image deleted successfully'
+                message: 'Xóa hình ảnh thành công!'
             });
         } else{
             response.json({
-                message: 'Image not found'
+                message: 'Hình ảnh không tồn tại!'
             });
         }
     } catch (error){
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }
 
@@ -108,11 +128,15 @@ exports.hinhanh_upload = async(request, response) =>{
         var result = await hinhanh.save();
         response.json({
             success: true,
-            message: 'Uploaded image successfully',
+            message: 'Đăng tải hình ảnh thành công!',
             hinhanh: result
         });
     } catch(error){
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 };
 
@@ -125,11 +149,16 @@ exports.hinh_upload = async(request, response)=>{
         var result = await hinhanh.save();
         response.json({
             success: true,
-            message: 'Upload image successfully',
+            message: 'Đăng tải hình ảnh thành công!',
             hinhanh: result
         })
     } catch (error){
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
+        // response.send(error);
     }
    
 }

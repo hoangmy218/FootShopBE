@@ -7,17 +7,17 @@ const {check, validationResult} = require('express-validator');
 exports.YeuThich_create = async(request, response)=>{
     try {
         var dssp = await YeuThich.find(
-            { nguoidung_id: request.user._id}).exec();
+            { nguoidung_id: request.payload.username}).exec();
         
         if (dssp.length == 0){
             var yeuthich = new YeuThich({
-                nguoidung_id: request.user._id,
+                nguoidung_id: request.payload.username,
                 sanpham_ids: request.params.id
             })
             var yc = await yeuthich.save()
             response.json({
                 success: true,
-                message: 'Product added to favorite successfully',
+                message: 'Thêm sản phẩm vào danh sách yêu thích thành công!',
                 data: yc
             })
         } else {
@@ -33,12 +33,12 @@ exports.YeuThich_create = async(request, response)=>{
                 response.json({
                     success: true,
                     data: ds,
-                    message: 'Product added to favorite successfully',
+                    message: 'Thêm sản phẩm vào danh sách yêu thích thành công!',
                     sp: ds_sanpham.sanpham_ids
                 })
             } else{
                 response.json({
-                    message: 'Product already added'
+                    message: 'Sản phẩm đã có trong danh sách yêu thích!'
                 })
             }
             
@@ -47,7 +47,7 @@ exports.YeuThich_create = async(request, response)=>{
         response.json({
             success: false,
             error: error,
-            message: 'Cannot add product to favorite'
+            message: 'Không thể thêm sản phẩm vào danh sách yêu thích!'
         })
     }
 }
@@ -55,7 +55,7 @@ exports.YeuThich_create = async(request, response)=>{
 exports.YeuThich_list  = async(request, response)=>{
     try {
         var ds_sanpham = await YeuThich.find(
-            { nguoidung_id: request.user._id}).exec();
+            { nguoidung_id: request.payload.username}).exec();
         response.json({
             data: ds_sanpham
         })
@@ -70,10 +70,10 @@ exports.YeuThich_list  = async(request, response)=>{
 exports.YeuThich_delete = async(request, response)=>{
     try {
         var dssp = await YeuThich.find(
-            { nguoidung_id: request.user._id}).exec();
+            { nguoidung_id: request.payload.username}).exec();
         if (dssp.length == 0){
             response.json({
-                message: 'List favorite is empty'
+                message: 'Danh sách yêu thích trống!'
             })
         }
         var ds_sanpham = await YeuThich.findById(dssp[0]._id).exec();
@@ -89,13 +89,13 @@ exports.YeuThich_delete = async(request, response)=>{
             
             response.json({
                 success: true,
-                message: 'Product deleted successfully'
+                message: 'Xóa sản phẩm khỏi danh sách yêu thích thành công!'
             })
         } else{
             await YeuThich.deleteOne({_id: dssp[0]._id}).exec()
             response.json({
                 success: true,
-                message: 'Product deleted successfully'
+                message: 'Xóa sản phẩm khỏi danh sách yêu thích thành công!'
             })
         }
     } catch (error) {

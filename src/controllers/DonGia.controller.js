@@ -13,7 +13,7 @@ exports.dongia_create = async(request, response)=>{
         if (request.body.dongia < 1000){
             response.json({
                 success: false,
-                message: 'Min dongia must be 1000'
+                message: 'Đơn giá ít nhất là 1000'
             })
         }
         try {
@@ -26,12 +26,16 @@ exports.dongia_create = async(request, response)=>{
             const result = await DonGia.findById(res._id).populate('sanpham_id').exec();
             response.json({
                 success: true,
-                message: 'Price added successfully',
+                message: 'Thêm đơn giá thành công!',
                 data: result
             });
     
         } catch (error){
-            response.send(error);
+            console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
         }
     }
     
@@ -45,7 +49,11 @@ exports.dongia_list = async(request, response)=>{
         });
 
     } catch (error){
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }
 
@@ -57,6 +65,10 @@ exports.dongia_new = async(request, response)=>{
         });
 
     } catch (error){
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }

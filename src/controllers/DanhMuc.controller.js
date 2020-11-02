@@ -21,7 +21,7 @@ exports.danhmuc_create = async(request, response)=>{
             if (dm.length != 0){
                 response.json({    
                     success: false,      
-                    message: 'Category has exist',
+                    message: 'Danh mục đã tồn tại!',
                     data: dm
                 });
             } else {
@@ -29,13 +29,17 @@ exports.danhmuc_create = async(request, response)=>{
                 var result = await danhmuc.save();
                 response.json({
                     success: true,
-                    message: 'Category created successfully',
+                    message: 'Thêm danh mục thành công!',
                     data: result
                 });
             }
     
         } catch (error){
-            response.send(error);
+            console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
         }
     }
     
@@ -48,7 +52,11 @@ exports.danhmuc_list = async(request, response) =>{
             data: result
         });
     } catch (error){
-        response.status(500).send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 };
 
@@ -62,7 +70,7 @@ exports.danhmuc_get = async(request, response)=>{
         } else{
             response.json({
                 success: false,
-                message: 'Category not found'
+                message: 'Danh mục không tồn tại!'
             });
         }
         
@@ -88,14 +96,14 @@ exports.danhmuc_update = async(request, response)=>{
                     var res = await result.save();
                     response.json({
                         success: true,
-                        message: 'Category updated successfully',
+                        message: 'Cập nhật danh mục thành công!',
                         data: res
                     });
                 }
                 if (dm[0]._id != request.params.id){
                     response.json({        
                         success: false,  
-                        message: 'Category has exist',
+                        message: 'Danh mục đã tồn tại!',
                         data: dm
                     });
                 }
@@ -103,12 +111,16 @@ exports.danhmuc_update = async(request, response)=>{
             } else{
                 response.json({
                     success: false,
-                    message: 'Category not found'
+                    message: 'Danh mục không tồn tại!'
                 });
             }
             
         } catch(error){
-            response.send(error);
+            console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
         }
     }
     
@@ -122,23 +134,27 @@ exports.danhmuc_delete = async(request, response)=>{
             if (sp.length > 0){
                 response.json({
                     success: false,
-                    message: 'Cannot deleted this category'
+                    message: 'Không thể xóa danh mục!'
                 });
             }else {
                 var result = await DanhMuc.deleteOne({ _id: request.params.id}).exec();
                 response.json({
                     success: true,
-                    message: 'Category deleted successfully'
+                    message: 'Xóa danh mục thành công!'
                 });
             }
             
         } else{
             response.json({
                 success: false,
-                message: 'Category not found'
+                message: 'Danh mục không tồn tại!'
             });
         }
     } catch (error){
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }

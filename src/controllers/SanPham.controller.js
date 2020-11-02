@@ -16,7 +16,7 @@ exports.sanpham_create = async(request, response)=>{
             var sp = await SanPham.find({ ten: request.body.ten}).exec();
             if (sp.length != 0){
                 response.json({          
-                    message: 'Product has exist',
+                    message: 'Sản phẩm đã tồn tại!',
                     data: sp
                 });
             } else {
@@ -27,13 +27,17 @@ exports.sanpham_create = async(request, response)=>{
                 response.json({
                     data: result,
                     success: true,
-                    message: 'Product added successfully'
+                    message: 'Thêm sản phẩm thành công!'
                 });
                     
             }
     
         } catch (error){
-            response.send(error);
+            console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
         }
     }
 
@@ -50,7 +54,11 @@ exports.sanpham_list = async(request, response) =>{
     
     
     } catch (error){
-        response.status(500).send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 };
 
@@ -66,12 +74,16 @@ exports.sanpham_get = async(request, response)=>{
             });
         } else{
             response.json({
-                message: 'Product not found'
+                message: 'Sản phẩm không tồn tại!'
             });
         }
         
     } catch (error){
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 };
 
@@ -93,25 +105,29 @@ exports.sanpham_update = async(request, response)=>{
                     const sp = await SanPham.findById(res.id).populate('thuonghieu_id').populate('danhmuc_id').exec();
                     response.json({
                         success: true,
-                        message: 'Product updated successfully',
+                        message: 'Cập nhật sản phẩm thành công!',
                         data: sp
                     });
                 }
                 if (sp[0]._id != request.params.id){
                     response.json({          
-                        message: 'Product has exist',
+                        message: 'Sản phẩm đã tồn tại!',
                         data: sp
                     });
                 }
                 
             } else{
                 response.json({
-                    message: 'Product not found'
+                    message: 'Sản phẩm không tồn tại!'
                 });
             }
             
         } catch(error){
-            response.send(error);
+            console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
         }
     }
     
@@ -144,7 +160,7 @@ exports.sanpham_delete = async(request, response)=>{
                         response.json({
                             success: false,
                             // ctsp: ctpn[j],
-                            message: 'Cannot delete this product'
+                            message: 'Không thể xóa sản phẩm!'
                         })
                     }
                 }
@@ -167,7 +183,7 @@ exports.sanpham_delete = async(request, response)=>{
                         candelete = false
                         response.json({
                             success: false,
-                            message: 'Cannot delete this product'
+                            message: 'Không thể xóa sản phẩm!'
                         })
                     }
                 }
@@ -176,17 +192,21 @@ exports.sanpham_delete = async(request, response)=>{
             if (candelete == true){
                 var result = await SanPham.deleteOne({ _id: request.params.id}).exec();
                 response.json({
-                    message: 'Product deleted successfully'
+                    message: 'Xóa sản phẩm thành công!'
                 });
             }
             
         } else{
             response.json({
-                message: 'Product not found'
+                message: 'Sản phẩm không tồn tại!'
             });
         }
     } catch (error){
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }
 
@@ -198,16 +218,20 @@ exports.sanpham_active = async(request, response)=>{
             var res = await SanPham.findById(request.params.id).exec();
             response.json({
                 success: true,
-                message: 'Product activated successfully',
+                message: 'Kích hoạt sản phẩm thành công!',
                 data: res
             })
         } else{
             response.json({
-                message: 'Product not found'
+                message: 'Sản phẩm không tồn tại!'
             });
         }
     } catch (error) {
-        
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }
 
@@ -219,15 +243,19 @@ exports.sanpham_deactive = async(request, response)=>{
             var res = await SanPham.findById(request.params.id).exec();
             response.json({
                 success: true,
-                message: 'Product deactivated successfully',
+                message: 'Vô hiệu hóa sản phẩm thành công!',
                 data: res
             })
         } else{
             response.json({
-                message: 'Product not found'
+                message: 'Sản phẩm không tồn tại!'
             });
         }
     } catch (error) {
-        
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }

@@ -14,7 +14,7 @@ exports.htvc_create = async(request, response)=>{
         if (request.body.phi < 1000){
             response.json({
                 success: false,
-                error: 'Min cost must be 1000'
+                error: 'Phí vận chuyển ít nhất là 1000'
             });
         }else {
             try {
@@ -22,7 +22,7 @@ exports.htvc_create = async(request, response)=>{
                 if (hinhthuc.length != 0){
                     response.json({        
                         success: false,  
-                        message: 'Delivery has exist',
+                        message: 'Hình thức vận chuyển đã tồn tại!',
                         data: hinhthuc
                     });
                 } else {
@@ -30,14 +30,18 @@ exports.htvc_create = async(request, response)=>{
                     var result = await htvc.save();
                     response.json({
                         success: true,
-                        message: 'Delivery created successfully',
+                        message: 'Thêm hình thức vận chuyển thành công!',
                         data: result
                     });
                 }
         
             } catch (error){
                 
-                response.send(error);
+                console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
             }
         }
         
@@ -66,7 +70,7 @@ exports.htvc_get = async(request, response)=>{
         } else{
             response.json({
                 success: false,
-                message: 'Delivery not found'
+                message: 'Hình thức vận chuyển không tồn tại!'
             });
         }
         
@@ -85,7 +89,7 @@ exports.htvc_update = async(request, response)=>{
         if (request.body.phi < 1000){
             response.json({
                 success: false,
-                error: 'Min cost must be 1000'
+                error: 'Phí vận chuyển ít nhất là 1000'
             });
         }else {
             try{
@@ -98,14 +102,14 @@ exports.htvc_update = async(request, response)=>{
                         var res = await result.save();
                         response.json({
                             success: true,
-                            message: 'Delivery updated successfully',
+                            message: 'Cập nhật hình thức vận chuyển thành công!',
                             data: res
                         });
                     }
                     if (hinhthuc[0]._id != request.params.id){
                         response.json({        
                             success: false,  
-                            message: 'Delivery has exist',
+                            message: 'Hình thức vận chuyển đã tồn tại!',
                             data: hinhthuc
                         });
                     }
@@ -113,12 +117,16 @@ exports.htvc_update = async(request, response)=>{
                 } else{
                     response.json({
                         success: false,
-                        message: 'Delivery not found'
+                        message: 'Hình thức vận chuyển không tồn tại!'
                     });
                 }
                 
             } catch(error){
-                response.send(error);
+                console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
             }
         }
     }
@@ -133,23 +141,27 @@ exports.htvc_delete = async(request, response)=>{
             if (dh.length > 0){
                 response.json({
                     success: false,
-                    message: 'Cannot delete this delivery'
+                    message: 'Không thể xóa hình thức vận chuyển!'
                 });
             }else{
                 var result = await HTVC.deleteOne({ _id: request.params.id}).exec();
                 response.json({
                     success: true,
-                    message: 'Delivery deleted successfully'
+                    message: 'Xóa hình thức vận chuyển thành công!'
                 });
             }
             
         } else{
             response.json({
                 success: false,
-                message: 'Delivery not found'
+                message: 'Hình thức vận chuyển không tồn tại!'
             });
         }
     } catch (error){
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }

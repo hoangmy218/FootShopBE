@@ -16,7 +16,7 @@ exports.nhacungcap_create = async(request, response)=>{
             if (ncc.length != 0){
                 response.json({          
                     success: false,
-                    message: 'Supplier has exist',
+                    message: 'Nhà cung cấp đã tồn tại!',
                     data: ncc
                 });
             } else {
@@ -24,13 +24,17 @@ exports.nhacungcap_create = async(request, response)=>{
                 var result = await nhacungcap.save();
                 response.json({
                     success: true,
-                    message: 'Supplier added successfully',
+                    message: 'Thêm nhà cung cấp thành công!',
                     data: result
                 });
             }
     
         } catch (error){
-            response.send(error);
+            console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
         }
     }
     
@@ -43,7 +47,11 @@ exports.nhacungcap_list = async(request, response) =>{
             data: result
         });
     } catch (error){
-        response.status(500).send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 };
 
@@ -57,12 +65,16 @@ exports.nhacungcap_get = async(request, response)=>{
         } else{
             response.json({
                 success: false,
-                message: 'Supplier not found'
+                message: 'Nhà cung cấp không tồn tại!'
             });
         }
         
     } catch (error){
-        response.status(500).error(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 };
 
@@ -83,14 +95,14 @@ exports.nhacungcap_update = async(request, response)=>{
                     var res = await result.save();
                     response.json({
                         success: true,
-                        message: 'Supplier updated successfully',
+                        message: 'Cập nhật nhà cung cấp thành công!',
                         data: res
                     });
                 }
                 if (ncc[0]._id != request.params.id){
                     response.json({    
                         success: false,      
-                        message: 'Supplier has exist',
+                        message: 'Nhà cung cấp đã tồn tại!',
                         data: ncc
                     });
                 }
@@ -98,12 +110,16 @@ exports.nhacungcap_update = async(request, response)=>{
             } else{
                 response.json({
                     success: false,
-                    message: 'Supplier not found'
+                    message: 'Nhà cung cấp không tồn tại!'
                 });
             }
             
         } catch(error){
-            response.send(error);
+            console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
         }
     }
     
@@ -117,23 +133,27 @@ exports.nhacungcap_delete = async(request, response)=>{
             if (pn.length > 0){
                 response.json({
                     success: false,
-                    message: 'Cannot delete this supplier'
+                    message: 'Không thể xóa nhà cung cấp'
                 });
             }else { 
                 var result = await NhaCungCap.deleteOne({ _id: request.params.id}).exec();
                 response.json({
                     success: true,
-                    message: 'Supplier deleted successfully'
+                    message: 'Xóa nhà cung cấp thành công!'
                 });
             }
             
         } else{
             response.json({
                 success: false,
-                message: 'Supplier not found'
+                message: 'Nhà cung cấp không tồn tại!'
             });
         }
     } catch (error){
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }

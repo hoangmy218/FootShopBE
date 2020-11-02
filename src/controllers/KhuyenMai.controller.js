@@ -9,6 +9,7 @@ exports.khuyenmai_create = async(request, response)=>{
     var errors = validationResult(request)
     if (!errors.isEmpty()){
         response.json({
+            success: false,
             error: errors
         })
     }else {
@@ -18,7 +19,7 @@ exports.khuyenmai_create = async(request, response)=>{
             if (parseInt((ngaykt-ngaybd)/ (1000 * 60 * 60 * 24)) < 0){
                 response.json({ 
                     success: false,         
-                    message: 'The ended date must be later than the started date',
+                    message: 'Ngày kết thúc phải sau ngày bắt đầu khuyến mãi!',
                     data: request.body
                 });
             }
@@ -26,7 +27,7 @@ exports.khuyenmai_create = async(request, response)=>{
             if (km.length != 0){
                 response.json({    
                     success: false,      
-                    message: 'Discount has exist',
+                    message: 'Khuyến mãi đã tồn tại!',
                     data: km
                 });
             } else {
@@ -36,7 +37,7 @@ exports.khuyenmai_create = async(request, response)=>{
                 const result = await KhuyenMai.findById(res.id).populate('sanpham_id').exec();
                 response.json({
                     success: true,
-                    message: 'Discount added successfully',
+                    message: 'Thêm khuyến mãi thành công!',
                     data: result,
                     diff: parseInt((ngaykt-ngaybd)/ (1000 * 60 * 60 * 24))
                 });
@@ -44,7 +45,11 @@ exports.khuyenmai_create = async(request, response)=>{
             }
     
         } catch (error){
-            response.send(error);
+            console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
         }
     }
     
@@ -61,7 +66,11 @@ exports.khuyenmai_list = async(request, response) =>{
     
     
     } catch (error){
-        response.status(500).send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 };
 
@@ -76,12 +85,16 @@ exports.khuyenmai_get = async(request, response)=>{
         } else{
             response.json({
                 success: false,
-                message: 'Discount not found'
+                message: 'Khuyến mãi không tồn tại!'
             });
         }
         
     } catch (error){
-        response.status(500).error(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 };
 
@@ -100,7 +113,7 @@ exports.khuyenmai_update = async(request, response)=>{
                 if (parseInt((ngaykt-ngaybd)/ (1000 * 60 * 60 * 24)) < 0){
                     response.json({         
                         success: false, 
-                        message: 'The ended date must be later than the started date',
+                        message: 'Ngày kết thúc phải sau ngày bắt đầu khuyến mãi!',
                         data: request.body
                     });
                 } else{
@@ -112,14 +125,14 @@ exports.khuyenmai_update = async(request, response)=>{
                         const km = await KhuyenMai.findById(res.id).populate('sanpham_id').exec();
                         response.json({
                             success: true,
-                            message: 'Discount updated successfully',
+                            message: 'Cập nhật khuyến mãi thành công!',
                             data: km
                         });
                     }
                     if (km[0]._id != request.params.id){
                         response.json({    
                             success: false,      
-                            message: 'Discount has exist',
+                            message: 'Khuyến mãi đã tồn tại!',
                             data: km
                         });
                     }
@@ -130,12 +143,16 @@ exports.khuyenmai_update = async(request, response)=>{
             } else{
                 response.json({
                     success: false,
-                    message: 'Discount not found'
+                    message: 'Khuyến mãi không tồn tại!'
                 });
             }
             
         } catch(error){
-            response.send(error);
+            console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
         }
     }
     
@@ -154,16 +171,20 @@ exports.khuyenmai_delete = async(request, response)=>{
             var result = await KhuyenMai.deleteOne({ _id: request.params.id}).exec();
             response.json({
                 success: true,
-                message: 'Discount deleted successfully'
+                message: 'Xóa khuyến mãi thành công!'
             });
         } else{
             response.json({
                 success: false,
-                message: 'Discount not found'
+                message: 'Khuyến mãi không tồn tại!'
             });
         }
     } catch (error){
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }
 
@@ -175,17 +196,21 @@ exports.khuyenmai_active = async(request, response)=>{
             var res = await KhuyenMai.findById(request.params.id).exec();
             response.json({
                 success: true,
-                message: 'Discount activated successfully',
+                message: 'Kích hoạt khuyến mãi thành công!',
                 data: res
             })
         } else{
             response.json({
                 success: false,
-                message: 'Discount not found'
+                message: 'Khuyến mãi không tồn tại!'
             });
         }
     } catch (error) {
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }
 
@@ -197,17 +222,21 @@ exports.khuyenmai_deactive = async(request, response)=>{
             var res = await KhuyenMai.findById(request.params.id).exec();
             response.json({
                 success: true,
-                message: 'Discount deactivated successfully',
+                message: 'Hủy kích hoạt khuyến mãi thành công!',
                 data: res
             })
         } else{
             response.json({
                 success: false,
-                message: 'Discount not found'
+                message: 'Khuyến mãi không tồn tại!'
             });
         }
     } catch (error) {
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }
 
@@ -221,16 +250,20 @@ exports.khuyenmai_sanpham = async(request, response)=>{
             var sp_new = await SanPham.findById(request.body.sanpham_id).exec();
             response.json({
                 success: true,
-                message: "Add discount to product successfully",
+                message: "Thêm khuyến mãi cho sản phẩm thành công!",
                 data: sp_new
             });
         } else{
             response.json({
                 success: false,
-                message: 'Discount not found'
+                message: 'Khuyến mãi không tồn tại!'
             });
         }
     } catch (error) {
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }

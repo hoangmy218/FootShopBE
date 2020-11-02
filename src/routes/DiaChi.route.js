@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { check, validationResult} = require('express-validator')
-const auth = require('../middleware/auth')
-
+// const auth = require('../middleware/auth')
+const auth_validate = require('../controllers/Validate.controller');
+const auth = auth_validate.validate;
 
 // Require the controllers WHICH WE DID NOT CREATE YET!!
 const diachi_controller = require('../controllers/DiaChi.controller');

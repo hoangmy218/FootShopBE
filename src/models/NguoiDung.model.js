@@ -8,17 +8,17 @@ const jwt = require('jsonwebtoken')
 
 
 let NguoiDungSchema = new Schema({
-    ten: {type: String, require: true},
+    ten: {type: String},
     email: {type: String, unique: true, require: true, validate: value => {
         if (!validator.isEmail(value)) {
             throw new Error({error: 'Invalid Email address'})
         }
     }},
-    dienthoai: {type: String, require: true},
-    matkhau: {type: String, require: true, minlength: 7},
-    gioitinh: {type: Boolean, require: true},
-    ngaysinh: {type: Date, require: true},
-    trangthai: {type: Boolean, default: true, require: true},
+    dienthoai: {type: String },
+    matkhau: {type: String },
+    gioitinh: {type: Boolean},
+    ngaysinh: {type: Date},
+    trangthai: {type: Boolean},
     hinh: {type: String},
     role: {type: String, default: 'customer'},
     tokens: [{

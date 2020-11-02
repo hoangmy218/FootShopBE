@@ -20,7 +20,7 @@ exports.donhang_create = async(request, response)=>{
             ghichu: request.body.ghichu,
             ngaydat: request.body.ngaydat,
             diachi_id: request.body.diachi_id,
-            nguoidung_id: request.user._id,
+            nguoidung_id: request.payload.username,
             thanhtoan_id: request.body.thanhtoan_id,
             vanchuyen_id: request.body.vanchuyen_id
         });
@@ -33,17 +33,18 @@ exports.donhang_create = async(request, response)=>{
         //GET SANPHAM - 1 
         var sanpham = request.body.sanpham;
         //GET CART - 2
-        var sanpham = await GioHang.find({nguoidung_id: request.user._id}).exec()
-
+        var sanpham = await GioHang.find({nguoidung_id: request.payload.username}).exec()
+        console.log('gio hang ', sanpham)
         var tongtien = 0;
         var khuyenmai = 0;
         
-        for(var i = 0; i<sanpham.length; i++){
+        for(const sanpham_i of sanpham){
             //CHECK SO LUONG DAT
-            var ctsp = await ChiTietSanPham.findById(sanpham[i].ctsp_id).populate('mausanpham_id').exec();
+            var ctsp = await ChiTietSanPham.findById(sanpham_i.ctsp_id).populate('mausanpham_id').exec();
+            console.log('sp i', sanpham_i)
             if (ctsp){
                 var soluongton = ctsp.soluong;
-                var soluongdat = sanpham[i].soluongdat;
+                var soluongdat = sanpham_i.soluongdat;
                 if (soluongton > 0){
                     if (soluongdat > soluongton) {
                         soluongdat =  soluongton
@@ -71,31 +72,34 @@ exports.donhang_create = async(request, response)=>{
                     
                     //THEM CTDH
                     var ctdh = new ChiTietDonHang({
-                        ctsp_id: sanpham[i].ctsp_id,
+                        ctsp_id: sanpham_i.ctsp_id,
                         donhang_id: ma_donhang,
                         soluongdat: soluongdat,
                         dongia: dongia
                     });
+                    console.log('ctsdp i',ctsp)
                     console.log('ctdh', ctdh)
-                    console.log('sp i', sanpham[i])
-                    console.log('ctsdp i', ctsp)
-                    var sanpham = await ChiTietSanPham.update({_id: sanpham[i].ctsp_id}, {$set: {soluong: ctsp.soluong - soluongdat }})
+                   
+                    
+                    var sanpham = await ChiTietSanPham.update({_id: sanpham_i.ctsp_id}, {$set: {soluong: ctsp.soluong - soluongdat }})
                     var ctdh_moi = await ctdh.save();
-                    console.log(ctdh_moi)
+                    console.log('save',ctdh_moi)
                 } 
             }
             
         }
         
         var ctdh_all = await ChiTietDonHang.find({ donhang_id: ma_donhang }).exec();
+        console.log('ctdh_all', ctdh_all)
         if (ctdh_all.length > 0){
             var dh_cn = await DonHang.update(
                 {_id: ma_donhang},
                 {$set: {tongtien: tongtien-khuyenmai}}).exec();
             var dh_moi = await DonHang.findById(ma_donhang).exec();
+            console.log('dhmoi', dh_moi)
             response.json({
                 success: true,
-                message: 'Order added successfully',
+                message: 'Thêm đơn hàng thành công!',
                 data: dh_moi,
                 detail: ctdh_all
             });
@@ -103,10 +107,10 @@ exports.donhang_create = async(request, response)=>{
             await DonHang.deleteOne({ _id: ma_donhang}).exec();
             response.json({
                 success: false,
-                message: 'Out of stock'
+                message: 'Hết hàng!'
             });
         }
-        await GioHang.deleteMany({nguoidung_id: request.user._id}).exec()
+        await GioHang.deleteMany({nguoidung_id: request.payload.username}).exec()
 
     } catch (error){
         console.log(error)
@@ -120,13 +124,17 @@ exports.donhang_create = async(request, response)=>{
 //done
 exports.donhang_userlist = async(request, response) =>{
     try {
-        const result = await DonHang.find({nguoidung_id: request.params.id}).sort({ngaydat: -1})
+        const result = await DonHang.find({nguoidung_id: request.payload.username}).sort({ngaydat: -1})
             .populate('nguoidung_id').populate('thanhtoan_id').populate('vanchuyen_id').exec();
         response.json({
             data: result
         });
     } catch (error){
-        response.status(500).send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 };
 
@@ -140,7 +148,11 @@ exports.donhang_list = async(request, response)=>{
             data: result
         });
     } catch (error){
-        response.status(500).send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }
 
@@ -153,16 +165,20 @@ exports.donhang_confirm = async(request, response)=>{
             var res = await DonHang.findById(ma_donhang).exec();
             response.json({
                 success: true,
-                message: 'Order confirmed successfully',
+                message: 'Xác nhận đơn hàng thành công!',
                 data: res
             })
         } else{
             response.json({
-                message: 'Order not found'
+                message: 'Đơn hàng không tồn tại!'
             });
         }
     } catch (error) {
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }
 
@@ -175,16 +191,20 @@ exports.donhang_ship = async(request, response)=>{
             var res = await DonHang.findById(ma_donhang).exec();
             response.json({
                 success: true,
-                message: 'Order shipped successfully',
+                message: 'Giao đơn hàng thành công!',
                 data: res
             })
         } else{
             response.json({
-                message: 'Order not found'
+                message: 'Đơn hàng không tồn tại!'
             });
         }
     } catch (error) {
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }
 
@@ -197,16 +217,20 @@ exports.donhang_complete = async(request, response)=>{
             var res = await DonHang.findById(ma_donhang).exec();
             response.json({
                 success: true,
-                message: 'Order completed successfully',
+                message: 'Hoàn tất đơn hàng thành công!',
                 data: res
             })
         } else{
             response.json({
-                message: 'Order not found'
+                message: 'Đơn hàng không tồn tại!'
             });
         }
     } catch (error) {
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }
 
@@ -219,16 +243,20 @@ exports.donhang_cancel = async(request, response)=>{
             var res = await DonHang.findById(ma_donhang).exec();
             response.json({
                 success: true,
-                message: 'Order cancelled successfully',
+                message: 'Hủy đơn hàng thành công!',
                 data: res
             })
         } else{
             response.json({
-                message: 'Order not found'
+                message: 'Đơn hàng không tồn tại!'
             });
         }
     } catch (error) {
-        response.send(error);
+        console.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 }
 
@@ -260,11 +288,15 @@ exports.donhang_get = async(request, response)=>{
             });
         } else{
             response.json({
-                message: 'Stock receipt not found'
+                message: 'Đơn hàng không tồn tại!'
             });
         }
         
     } catch (error){
-        response.status(500).error(error);
+        rconsole.log(error);
+        response.json({
+            success: false,
+            message: error
+        })
     }
 };
