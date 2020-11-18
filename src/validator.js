@@ -146,7 +146,7 @@ let validateSanPham = () =>{
         check('ten', 'Ten is required').not().isEmpty(),
         check('ten', 'Ten length should be 5 to 50 characters').trim().isLength({min: 5, max: 50}),
         check('mota', 'Mota is required').not().isEmpty(),
-        check('mota', 'Mota length should be 10 to 100 characters').trim().isLength({min: 10, max: 100}),
+        check('mota', 'Mota length should be 10 to 500 characters').trim().isLength({min: 10, max: 500}),
         check('danhmuc_id', 'DanhMuc is required').not().isEmpty(),
         check('thuonghieu_id', 'ThuongHieu is required').not().isEmpty()
     ]

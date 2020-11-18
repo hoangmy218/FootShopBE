@@ -24,5 +24,6 @@ router.get('/htvc', Landing_controller.htvc_get);
 router.get('/htvc/:id', Landing_controller.htvc_details);
 router.get('/httt', Landing_controller.httt_get);
 router.post('/payWithStripe', Landing_controller.stripePost);
+router.get('/list-image/:id', Landing_controller.mausanpham_prolist);
 
 module.exports = router;

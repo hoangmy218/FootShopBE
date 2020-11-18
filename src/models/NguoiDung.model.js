@@ -25,6 +25,7 @@ let NguoiDungSchema = new Schema({
         token: {type: String, required: true}
     }]
 });
+// Nu: True, Nam: False
 
 NguoiDungSchema.pre('save', async function(next){
     const user = this

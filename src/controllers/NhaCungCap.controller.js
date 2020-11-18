@@ -5,6 +5,7 @@ const PhieuNhap = require('../models/PhieuNhap.model')
 
 exports.nhacungcap_create = async(request, response)=>{
     var errors = validationResult(request)
+    console.log(request.body)
     if (!errors.isEmpty()){
         response.json({
             success: false,
@@ -42,7 +43,7 @@ exports.nhacungcap_create = async(request, response)=>{
 
 exports.nhacungcap_list = async(request, response) =>{
     try {
-        var result = await NhaCungCap.find().exec();
+        var result = await NhaCungCap.find().sort({_id: -1}).exec();
         response.json({
             data: result
         });

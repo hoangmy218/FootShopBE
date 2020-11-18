@@ -9,7 +9,7 @@ const auth_validate = require('../controllers/Validate.controller');
 const auth = auth_validate.validate;
 // a simple test url to check that all of our files are communicating correctly.
 
-
+    
 router.post('/:id/create',auth, validate.validateDonGia(), dongia_controller.dongia_create);
 router.get('/:id/list', auth, dongia_controller.dongia_list);
 router.get('/:id/new', auth, dongia_controller.dongia_new);

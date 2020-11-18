@@ -150,22 +150,32 @@ exports.sanpham_delete = async(request, response)=>{
                     ]
                 }).exec();
                 
-
-            for (var j = 0; j <ctpn.length; j++){
-                if (ctpn[j].chitietsanpham_id.mausanpham_id.sanpham_id != null){
+            if (ctpn != null || ctpn.length == 0){
+                for (var j = 0; j <ctpn.length; j++){
                     
-                    if (ctpn[j].chitietsanpham_id.mausanpham_id.sanpham_id._id == request.params.id){
-                        
-                        candelete = false
-                        response.json({
-                            success: false,
-                            // ctsp: ctpn[j],
-                            message: 'Không thể xóa sản phẩm!'
-                        })
+                    if (ctpn[j].chitietsanpham_id == null){
+                        await ChiTietPhieuNhap.deleteOne({_id: ctpn[j]._id}).exec();
                     }
+                    else{
+                        if (ctpn[j].chitietsanpham_id.mausanpham_id.sanpham_id != null){
+                        
+                            if (ctpn[j].chitietsanpham_id.mausanpham_id.sanpham_id._id == request.params.id){
+                                console.log('ctph',i,ctpn[j], ctpn[j].chitietsanpham_id)
+                                candelete = false
+                                response.json({
+                                    success: false,
+                                    // ctsp: ctpn[j],
+                                    message: 'Không thể xóa sản phẩm!'
+                                })
+                            }
+                        }
+                    }
+                    
+                   
+                    
                 }
-                
             }
+            
 
             var ctdh  = await ChiTietDonHang.find({})
                 .populate({
@@ -177,17 +187,26 @@ exports.sanpham_delete = async(request, response)=>{
                         }
                     ]
                 }).exec();
-            for (var i = 0; i <ctdh.length; i++){
-                if (ctdh[i].ctsp_id.mausanpham_id.sanpham_id != null){
-                    if (ctdh[i].ctsp_id.mausanpham_id.sanpham_id._id == request.params.id){
-                        candelete = false
-                        response.json({
-                            success: false,
-                            message: 'Không thể xóa sản phẩm!'
-                        })
+            if (ctdh != null || ctdh.length == 0){
+                for (var i = 0; i <ctdh.length; i++){
+                    
+                    if (ctdh[i].ctsp_id == null){
+                        await ChiTietPhieuNhap.deleteOne({_id: ctdh[i]._id}).exec();
                     }
+                    else{
+                        if (ctdh[i].ctsp_id.mausanpham_id.sanpham_id != null){
+                            if (ctdh[i].ctsp_id.mausanpham_id.sanpham_id._id == request.params.id){
+                                candelete = false
+                                console.log('ctdh',i, ctdh[i], ctdh[i].ctsp_id)
+                                response.json({
+                                    success: false,
+                                    message: 'Không thể xóa sản phẩm!'
+                                })
+                            }
+                        }
+                    }
+                    
                 }
-                
             }
             if (candelete == true){
                 var result = await SanPham.deleteOne({ _id: request.params.id}).exec();

@@ -31,13 +31,50 @@ exports.auth_register  = async(request, response)=>{
                 // data: nd
             });
         } else{
-            const user = new NguoiDung(request.body)
+            const user = new NguoiDung({
+                ten: request.body.ten,
+                email: request.body.email,
+                dienthoai: '',
+                gioitinh: false,
+                ngaysinh: '',
+                trangthai: true,
+                hinh: '',
+                role: 'customer'})
             var user_new = await user.save();
             response.json({
                 success: true,
                 data: user_new
             })
         }
+        
+    } catch (error) {
+        console.log(error)
+        response.json({
+            message: error
+        })
+    }
+}
+
+exports.auth_update  = async(request, response)=>{
+    try {
+        var nd = await NguoiDung.findById(request.payload.username).exec();
+        if (nd){
+            console.log(request.body)
+            nd.set({
+                ten: request.body.ten,
+                gioitinh: request.body.gioitinh,
+                dienthoai: request.body.dienthoai,
+                ngaysinh: request.body.ngaysinh
+            })
+            var user_update= await nd.save();
+            response.json({
+                success: true,
+                message:'Cập nhật thông tin người dùng thành công',
+                data: user_update
+            })
+        }
+            
+        
         
     } catch (error) {
         console.log(error)

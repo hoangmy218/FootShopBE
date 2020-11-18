@@ -143,6 +143,7 @@ exports.hinhanh_upload = async(request, response) =>{
 exports.hinh_upload = async(request, response)=>{
     try{
         var url =  'http://localhost:3000/uploads/' + request.file.filename;
+        console.log('request', request);
         var hinhanh = new HinhAnh();
         hinhanh.hinh = url;
         hinhanh.stt = request.body.stt;
@@ -162,3 +163,4 @@ exports.hinh_upload = async(request, response)=>{
     }
    
 }
+

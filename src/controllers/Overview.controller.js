@@ -364,7 +364,13 @@ exports.Overview_stock_graph = async(request, response)=>{
                     { _id: {yearBillDate: "$yearBillDate", monthBillDate: "$monthBillDate"},
                         sum: {$sum: 1}
                     }
-                } 
+                } ,
+                { $sort:
+                    {
+                        "_id.monthBillDate": 1
+                    }
+                    
+                }
             ])
             response.json({data: phieunhap})
         
@@ -389,7 +395,13 @@ exports.Overview_order_graph = async(request, response)=>{
                     { _id: {yearBillDate: "$yearBillDate", monthBillDate: "$monthBillDate"},
                         sum: {$sum: 1}
                     }
-                } 
+                },
+                { $sort:
+                    {
+                        "_id.monthBillDate": 1
+                    }
+                    
+                }
             ])
             response.json({data: donhang})
         
@@ -417,7 +429,14 @@ exports.Overview_revenue_graph = async(request, response)=>{
                         sum: {$sum: 1},
                         total: {$sum: "$tongtien"}
                     }
+                },
+                { $sort:
+                    {
+                        "_id.monthBillDate": 1
+                    }
+                    
                 } 
+
             ])
             response.json(donhang)
         

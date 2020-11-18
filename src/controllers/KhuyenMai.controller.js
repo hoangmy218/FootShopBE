@@ -4,6 +4,7 @@ const SanPham = require('../models/SanPham.model');
 const mongoClient = require('mongodb').MongoClient;
 const {check, validationResult} = require('express-validator');
 const SanPhamModel = require('../models/SanPham.model');
+var _ = require('underscore');
 
 exports.khuyenmai_create = async(request, response)=>{
     var errors = validationResult(request)
@@ -22,27 +23,33 @@ exports.khuyenmai_create = async(request, response)=>{
                     message: 'Ngày kết thúc phải sau ngày bắt đầu khuyến mãi!',
                     data: request.body
                 });
-            }
-            var km = await KhuyenMai.find({ chude : request.body.chude}).exec();
-            if (km.length != 0){
-                response.json({    
-                    success: false,      
-                    message: 'Khuyến mãi đã tồn tại!',
-                    data: km
-                });
-            } else {
-                var khuyenmai = new KhuyenMai(request.body);
-                var res = await khuyenmai.save();
-                
-                const result = await KhuyenMai.findById(res.id).populate('sanpham_id').exec();
-                response.json({
-                    success: true,
-                    message: 'Thêm khuyến mãi thành công!',
-                    data: result,
-                    diff: parseInt((ngaykt-ngaybd)/ (1000 * 60 * 60 * 24))
-                });
+            }else{
+                var km = await KhuyenMai.find({ chude : request.body.chude}).exec();
+                if (km.length != 0){
+                    response.json({    
+                        success: false,      
+                        message: 'Chủ đề khuyến mãi đã tồn tại!',
+                        data: km
+                    });
+                } else {
+                    var khuyenmai = new KhuyenMai(request.body);
+                    var res = await khuyenmai.save();
                     
+                    const result = await KhuyenMai.findById(res.id).populate('sanpham_id').exec();
+                    var productlist = request.body.sanpham_id;
+                    for (const pro of productlist){
+                        var sp = await SanPham.update({ _id: pro}, {$set: {khuyenmai_id: result._id}}).exec();
+                    }
+                    response.json({
+                        success: true,
+                        message: 'Thêm khuyến mãi thành công!',
+                        data: result,
+                        diff: parseInt((ngaykt-ngaybd)/ (1000 * 60 * 60 * 24))
+                    });
+                        
+                }
             }
+            
     
         } catch (error){
             console.log(error);
@@ -58,7 +65,7 @@ exports.khuyenmai_create = async(request, response)=>{
 exports.khuyenmai_list = async(request, response) =>{
     try {
         
-        const result = await KhuyenMai.find().populate('sanpham_id').exec();
+        const result = await KhuyenMai.find().populate('sanpham_id').sort({_id: -1}).exec();
 
         response.json({
             data: result
@@ -107,6 +114,12 @@ exports.khuyenmai_update = async(request, response)=>{
     }else {
         try{
             var result = await KhuyenMai.findById(request.params.id).exec();
+            var discount_id = request.params.id;
+            var productList_old = [];
+            result['sanpham_id'].forEach(element => {
+                productList_old.push(element+"")
+            });
+            var productList_new = request.body.sanpham_id;
             if (result){
                 var ngaybd = new Date(request.body.ngaybd);
                 var ngaykt = new Date(request.body.ngaykt);
@@ -120,9 +133,32 @@ exports.khuyenmai_update = async(request, response)=>{
                     //Check name unique
                     var km = await KhuyenMai.find({ chude: request.body.chude}).exec();
                     if ((km.length == 0) || (km[0].id == request.params.id)){
+
+                        //UPDATE SANPHAM-KHUYENMAI
+                        console.log('xóa', _.difference(productList_old, productList_new), productList_old, productList_new );
+                        console.log('thêm', _.difference(productList_new, productList_old));
+                        var  deleteOldList= _.difference(productList_old, productList_new);
+                        var  addNewList = _.difference(productList_new, productList_old);
+                        if (deleteOldList.length > 0){
+                            for (const pro of deleteOldList){
+                                var sp = await SanPham.update({ _id: pro}, {$set: {khuyenmai_id: null}}).exec();
+                            }
+                        }
+                        if (addNewList.length > 0){
+                            for (const pro of addNewList){
+                                var sp = await SanPham.update({ _id: pro}, {$set: {khuyenmai_id: discount_id}}).exec();
+                            }
+                        }
+
+
+
+
+                        //update KHUYEN MAI
                         result.set(request.body);
                         var res = await result.save();
                         const km = await KhuyenMai.findById(res.id).populate('sanpham_id').exec();
+                        
+                        
                         response.json({
                             success: true,
                             message: 'Cập nhật khuyến mãi thành công!',

@@ -42,7 +42,7 @@ exports.kichco_create = async(request, response)=>{
 
 exports.kichco_list = async(request, response) =>{
     try {
-        var result = await KichCo.find().exec();
+        var result = await KichCo.find().sort({_id: -1}).exec();
         response.json({
             data: result
         });

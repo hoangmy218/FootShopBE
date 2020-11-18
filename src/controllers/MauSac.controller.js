@@ -44,7 +44,7 @@ exports.mausac_create = async(request, response)=>{
 
 exports.mausac_list = async(request, response) =>{
     try {
-        var result = await MauSac.find().exec();
+        var result = await MauSac.find().sort({_id: -1}).exec();
         response.json({
             data: result
         });

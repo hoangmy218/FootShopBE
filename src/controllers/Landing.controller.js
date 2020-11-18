@@ -72,7 +72,7 @@ exports.sanpham_timkiem2 = async(request, response)=>{
             var result = []
             // var sanpham = []
             var sp_hople = []
-            var sanpham = await SanPham.find(query).exec()
+            var sanpham = await SanPham.find(query).populate('khuyenmai_id').exec()
             console.log('SAN PHAM', sanpham)
             var ctsp = await ChiTietSanPham.aggregate([
                 {
@@ -219,7 +219,7 @@ exports.sanpham_list = async(request, response)=>{
     try {
         var result = []
         var sanpham = []
-        sanpham = await SanPham.find({trangthai: true}).exec()
+        sanpham = await SanPham.find({trangthai: true}).populate('khuyenmai_id').exec()
         for(var i = 0; i<sanpham.length; i++){
             result[i] = {}
             result[i].sanpham = sanpham[i]
@@ -262,7 +262,7 @@ exports.sanpham_list2 = async(request, response)=>{
         var result = []
         // var sanpham = []
         var sp_hople = []
-        var sanpham = await SanPham.find({trangthai: true}).exec()
+        var sanpham = await SanPham.find({trangthai: true}).populate('khuyenmai_id').exec()
         console.log('SAN PHAM', sanpham)
         var ctsp = await ChiTietSanPham.aggregate([
             {
@@ -724,7 +724,7 @@ exports.sanpham_details = async(request, response)=>{
     try {
         var ma_sanpham = request.params.id 
         var ma_mausac = request.params.color
-        sanpham = await SanPham.findById(ma_sanpham).exec()
+        sanpham = await SanPham.findById(ma_sanpham).populate('khuyenmai_id').exec()
         console.log('sp', sanpham)
         var list_procolor = await MauSanPhamModel.find({sanpham_id: ma_sanpham, hinh: {$ne: null}}).populate('mausac_id').populate('hinh[]').exec()
         var list_procolor_ok = [];
@@ -901,4 +901,24 @@ exports.stripePost = async(request, response)=>{
         });
     })
     console.log(request.body)
+}
+
+exports.mausanpham_prolist = async(request, response)=>{
+    try {
+        var res = [];
+        var item = {};
+
+        const result = await MauSanPhamModel.findById(request.params.id).populate('hinh').exec();
+        
+        response.json({
+            data: result,
+            details: res
+        });
+    } catch (error) {
+        console.log(error)
+        response.json({
+            success: false,
+            message: error
+        })
+    }
 }
