@@ -238,7 +238,7 @@ exports.giohang_list = async(request, response)=>{
                     {path: 'kichco_id'},
                     {
                     path: 'mausanpham_id',
-                    populate: [{path: 'mausac_id'}, {path: 'sanpham_id'}]
+                    populate: [{path: 'mausac_id'}, {path: 'sanpham_id', populate: [{path:'khuyenmai_id'}]}]
                 }]
             
             })

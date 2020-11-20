@@ -7,6 +7,7 @@ const SanPham = require('../models/SanPham.model');
 const NguoiDung = require('../models/NguoiDung.model');
 const DonHang = require('../models/DonHang.model');
 const ChiTietDonHang = require('../models/ChiTietDonHang.model');
+const ChiTietPhieuNhap = require('../models/ChiTietPhieuNhap.model');
 const BinhLuan = require('../models/BinhLuan.model');
 const PhieuNhap = require('../models/PhieuNhap.model');
 const mongoose = require('mongoose');
@@ -354,15 +355,17 @@ exports.Overview_stock_graph = async(request, response)=>{
     try {
         
             var phieunhap = await PhieuNhap.aggregate([
+                
                 { $project:
                     { _id: 1,
                         yearBillDate: {$year: "$ngay"},
-                        monthBillDate: {$month: "$ngay"}
+                        monthBillDate: {$month: "$ngay"},
+                        tongnhap : "$tongnhap"
                     }
                 },
                 { $group:
                     { _id: {yearBillDate: "$yearBillDate", monthBillDate: "$monthBillDate"},
-                        sum: {$sum: 1}
+                        sum: {$sum: "$tongnhap"}
                     }
                 } ,
                 { $sort:
@@ -382,6 +385,63 @@ exports.Overview_stock_graph = async(request, response)=>{
 }
 
 exports.Overview_order_graph = async(request, response)=>{
+    try {
+        
+            var donhang = await ChiTietDonHang.aggregate([
+                
+                {
+                    $lookup: 
+                        {
+                            from: "donhangs",
+                            localField: "donhang_id",
+                            foreignField: "_id",
+                            as: "donhang_id"
+                        }
+                 },
+                 {
+                    $unwind: {
+                      path: "$donhang_id",
+                      preserveNullAndEmptyArrays: true
+                    }
+                },
+               
+                
+                    { $project:
+                        { _id: 1,
+                            yearBillDate: {$year: "$donhang_id.ngaydat"},
+                            monthBillDate: {$month: "$donhang_id.ngaydat"},
+                            soluongdat:  "$soluongdat",
+                            trangthai: "$donhang_id.trangthai"
+                        }
+                    },
+                    { $match: {
+                        $and: [
+                            { trangthai: { $gte: 2 } },
+                            { trangthai: { $lte: 4 } }
+                        ]
+                    } },
+                    { $group:
+                        { _id: {yearBillDate: "$yearBillDate", monthBillDate: "$monthBillDate"},
+                            sum: {$sum: "$soluongdat"}
+                        }
+                    },
+                    { $sort:
+                        {
+                            "_id.monthBillDate": 1
+                        }
+                        
+                    }
+                ])
+                response.json({data: donhang})
+        
+    } catch (error) {
+        response.json({
+            message: error
+        })
+    }
+}
+
+exports.Overview_orderpro_graph = async(request, response)=>{
     try {
         
             var donhang = await DonHang.aggregate([

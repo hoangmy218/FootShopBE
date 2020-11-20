@@ -404,7 +404,7 @@ exports.sanpham_probrand = async(request, response)=>{
         var result = []
         // var sanpham = []
         var sp_hople = []
-        var sanpham = await SanPham.find({trangthai: true, thuonghieu_id: request.params.thuonghieu_id}).exec()
+        var sanpham = await SanPham.find({trangthai: true, thuonghieu_id: request.params.thuonghieu_id}).populate('khuyenmai_id').exec()
         console.log('SAN PHAM', sanpham)
         var ctsp = await ChiTietSanPham.aggregate([
             {
@@ -545,7 +545,7 @@ exports.sanpham_procate = async(request, response)=>{
         var result = []
         // var sanpham = []
         var sp_hople = []
-        var sanpham = await SanPham.find({trangthai: true, danhmuc_id: request.params.danhmuc_id}).exec()
+        var sanpham = await SanPham.find({trangthai: true, danhmuc_id: request.params.danhmuc_id}).populate('khuyenmai_id').exec()
         console.log('SAN PHAM', sanpham)
         var ctsp = await ChiTietSanPham.aggregate([
             {

@@ -23,12 +23,13 @@ router.get('/customer-graph', auth, Overview_controller.Overview_customer_graph)
 //Order monthly graph
 router.get('/order-graph', auth, Overview_controller.Overview_order_graph);
 
+
 //Revenue monthly graph
 router.get('/revenue-graph', auth, Overview_controller.Overview_revenue_graph);
 
 //Revenue monthly graph
 router.get('/stock-graph', auth, Overview_controller.Overview_stock_graph);
-
+// router.get('/stock-pro-graph', auth, Overview_controller.Overview_stockproduct_graph);
 
 //List of low stock product
 router.get('/low-stocks', auth, Overview_controller.Overview_low_stocks);

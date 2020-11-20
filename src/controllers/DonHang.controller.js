@@ -36,9 +36,11 @@ exports.donhang_create = async(request, response)=>{
         var sanpham = await GioHang.find({nguoidung_id: request.payload.username}).exec()
         console.log('gio hang ', sanpham)
         var tongtien = 0;
-        var khuyenmai = 0;
+        var tong_khuyenmai = 0;
+        
         
         for(const sanpham_i of sanpham){
+            var khuyenmai = 0;
             //CHECK SO LUONG DAT
             var ctsp = await ChiTietSanPham.findById(sanpham_i.ctsp_id).populate('mausanpham_id').exec();
             console.log('sp i', sanpham_i)
@@ -62,10 +64,16 @@ exports.donhang_create = async(request, response)=>{
                     console.log(sp)
 
                     if (sp.khuyenmai_id != null){
-                        var ngaykt = sp.khuyenmai_id.ngaykt;
+                        var ngaykt = Date.parse(sp.khuyenmai_id.ngaykt);
+                        var ngaybd = Date.parse(sp.khuyenmai_id.ngaybd);
                         var ngayht = Date.now();
-                        if (parseInt((ngaykt-ngayht)/ (1000 * 60 * 60 * 24)) >= 0){
+                        if (
+                            (parseInt((ngaykt-ngayht)/ (1000 * 60 * 60 * 24)) >= 0)
+                            && (parseInt((ngayht-ngaybd)/ (1000 * 60 * 60 * 24)) >= 0)){
+                            console.log('ngaykt', ngaykt, 'ngayht', ngayht, 'ngaybd', ngaybd)
                             khuyenmai += thanhtien * sp.khuyenmai_id.giamgia / 100;
+                            tong_khuyenmai += khuyenmai;
+                            console.log('km', khuyenmai)
                         }
                     }
                     
@@ -75,7 +83,8 @@ exports.donhang_create = async(request, response)=>{
                         ctsp_id: sanpham_i.ctsp_id,
                         donhang_id: ma_donhang,
                         soluongdat: soluongdat,
-                        dongia: dongia
+                        dongia: dongia,
+                        khuyenmai: khuyenmai
                     });
                     console.log('ctsdp i',ctsp)
                     console.log('ctdh', ctdh)
@@ -91,10 +100,11 @@ exports.donhang_create = async(request, response)=>{
         
         var ctdh_all = await ChiTietDonHang.find({ donhang_id: ma_donhang }).exec();
         console.log('ctdh_all', ctdh_all)
+        console.log('tong_km', tong_khuyenmai)
         if (ctdh_all.length > 0){
             var dh_cn = await DonHang.update(
                 {_id: ma_donhang},
-                {$set: {tongtien: tongtien-khuyenmai}}).exec();
+                {$set: {tongtien: tongtien-tong_khuyenmai}}).exec();
             var dh_moi = await DonHang.findById(ma_donhang).exec();
             console.log('dhmoi', dh_moi)
             response.json({
