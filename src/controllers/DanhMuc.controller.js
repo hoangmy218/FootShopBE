@@ -47,7 +47,7 @@ exports.danhmuc_create = async(request, response)=>{
 
 exports.danhmuc_list = async(request, response) =>{
     try {
-        var result = await DanhMuc.find().exec();
+        var result = await DanhMuc.find().sort({_id: -1}).exec();
         response.json({
             data: result
         });

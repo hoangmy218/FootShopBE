@@ -46,7 +46,7 @@ exports.thuonghieu_create = async(request, response)=>{
 
 exports.thuonghieu_list = async(request, response) =>{
     try {
-        var result = await ThuongHieu.find().exec();
+        var result = await ThuongHieu.find().sort({_id: -1}).exec();
         response.json({
             data: result
         });

@@ -216,14 +216,20 @@ exports.mausac_delete = async(request, response)=>{
             })
             .exec(function(err, sp){            
                 for (var i = 0; i<sp.length; i++){
-                    if (sp[i].mausanpham_id.mausac_id._id == request.params.id){
-                        candelete = false
-                        response.json({
-                            success: false,
-                            message: 'Không thể xóa màu sắc!',
-                            sp: sp[i]
-                        });
+                    console.log(sp[i].mausanpham_id)
+                    if (sp[i].mausanpham_id != null ){
+                    if (sp[i].mausanpham_id.mausac_id != null){
+                        if (sp[i].mausanpham_id.mausac_id._id == request.params.id){
+                            candelete = false
+                            response.json({
+                                success: false,
+                                message: 'Không thể xóa màu sắc!',
+                                sp: sp[i]
+                            });
+                        }
                     }
+                }
+                    
                 }
             })
                 

@@ -27,6 +27,9 @@ router.get('/order-graph', auth, Overview_controller.Overview_order_graph);
 //Revenue monthly graph
 router.get('/revenue-graph', auth, Overview_controller.Overview_revenue_graph);
 
+//Product price graph
+router.get('/price-graph/:id', auth, Overview_controller.Overview_price_graph);
+
 //Revenue monthly graph
 router.get('/stock-graph', auth, Overview_controller.Overview_stock_graph);
 // router.get('/stock-pro-graph', auth, Overview_controller.Overview_stockproduct_graph);

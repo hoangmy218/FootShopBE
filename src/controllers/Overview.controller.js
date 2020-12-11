@@ -11,6 +11,8 @@ const ChiTietPhieuNhap = require('../models/ChiTietPhieuNhap.model');
 const BinhLuan = require('../models/BinhLuan.model');
 const PhieuNhap = require('../models/PhieuNhap.model');
 const mongoose = require('mongoose');
+var ObjectID = require('mongodb').ObjectID;
+// const DonGia = require('../models/DonGia.model');
 const Schema = mongoose.Schema;
 var ObjectId = mongoose.Schema.Types.ObjectId;
 const {check, validationResult} = require('express-validator');
@@ -506,6 +508,43 @@ exports.Overview_revenue_graph = async(request, response)=>{
         })
     }
 }
+
+exports.Overview_price_graph = async(request, response)=>{
+    try {
+        var sanpham_ma = request.params.id;
+            var dongia = await DonGia.aggregate([
+                {$match: {sanpham_id: new ObjectID(request.params.id)}},
+                { $project:
+                    { _id: 1,
+                        yearBillDate: {$year: "$ngay"},
+                        monthBillDate: {$month: "$ngay"},
+                        dongia: "$dongia"
+                    }
+                },
+                { $group:
+                    { _id: {yearBillDate: "$yearBillDate", monthBillDate: "$monthBillDate"},
+                        total: {$avg: "$dongia"}
+                    }
+                },
+                { $sort:
+                    {
+                        "_id.monthBillDate": 1
+                    }
+                    
+                } 
+
+            ])
+            console.log('dongia', dongia)
+            response.json(dongia)
+        
+    } catch (error) {
+        console.log(error)
+        response.json({
+            message: error
+        })
+    }
+}
+
 
 //STATISTIC
 
